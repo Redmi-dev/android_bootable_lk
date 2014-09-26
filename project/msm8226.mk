@@ -30,3 +30,7 @@ ENABLE_THUMB := false
 ifeq ($(ENABLE_SDHCI_SUPPORT),1)
 DEFINES += MMC_SDHCI_SUPPORT=1
 endif
+
+ifeq ($(EMMC_BOOT),1)
+DEFINES += _EMMC_BOOT=1
+endif
