@@ -48,8 +48,8 @@ static struct fbcon_config *config = NULL;
 #define RGB565_BLACK		0x0000
 #define RGB565_WHITE		0xffff
 
-#define RGB888_BLACK            0x000000
-#define RGB888_WHITE            0xffffff
+#define RGB888_BLACK		0x000000
+#define RGB888_WHITE		0xffffff
 
 #define FONT_WIDTH		5
 #define FONT_HEIGHT		12
@@ -60,8 +60,7 @@ static uint16_t			FGCOLOR;
 static struct pos		cur_pos;
 static struct pos		max_pos;
 
-static void fbcon_drawglyph(uint16_t *pixels, uint16_t paint, unsigned stride,
-			    unsigned *glyph)
+static void fbcon_drawglyph(uint16_t *pixels, uint16_t paint, unsigned stride, unsigned *glyph)
 {
 	unsigned x, y, data;
 	stride -= FONT_WIDTH;
@@ -123,7 +122,6 @@ void fbcon_clear(void)
 	memset(config->base, BGCOLOR, count * ((config->bpp) / 8));
 }
 
-
 static void fbcon_set_colors(unsigned bg, unsigned fg)
 {
 	BGCOLOR = bg;
@@ -182,10 +180,10 @@ void fbcon_setup(struct fbcon_config *_config)
 		fg = RGB565_WHITE;
 		bg = RGB565_BLACK;
 		break;
-        case FB_FORMAT_RGB888:
-                fg = RGB888_WHITE;
-                bg = RGB888_BLACK;
-                break;
+	case FB_FORMAT_RGB888:
+		fg = RGB888_WHITE;
+		bg = RGB888_BLACK;
+		break;
 	default:
 		dprintf(CRITICAL, "unknown framebuffer pixel format\n");
 		ASSERT(0);
@@ -205,7 +203,7 @@ void fbcon_setup(struct fbcon_config *_config)
 
 struct fbcon_config* fbcon_display(void)
 {
-    return config;
+	return config;
 }
 
 
@@ -231,16 +229,35 @@ void display_image_on_screen()
 	fbcon_putImage(fbimg, flag);
 }
 
+void display_fastboot_image_on_screen()
+{
+	struct fbimage default_fbimg, *fbimg;
+	bool flag = true;
+
+	fbcon_clear();
+	fbimg = fetch_image_from_partition();
+
+	if(!fbimg) {
+		flag = false;
+		fbimg = &default_fbimg;
+		fbimg->header.width = SPLASH_IMAGE_HEIGHT_FASTBOOT;
+		fbimg->header.height = SPLASH_IMAGE_WIDTH_FASTBOOT;
+		fbimg->image = (unsigned char *)imageBuffer_fastboot_rgb888;
+	}
+
+	fbcon_putImage(fbimg, flag);
+}
+
 void fbcon_putImage(struct fbimage *fbimg, bool flag)
 {
-    unsigned i = 0;
-    unsigned total_x;
-    unsigned total_y;
-    unsigned bytes_per_bpp;
-    unsigned image_base;
-    unsigned width, pitch, height;
-    unsigned char *logo_base;
-    struct logo_img_header *header;
+	unsigned i = 0;
+	unsigned total_x;
+	unsigned total_y;
+	unsigned bytes_per_bpp;
+	unsigned image_base;
+	unsigned width, pitch, height;
+	unsigned char *logo_base;
+	struct logo_img_header *header;
 
 
 	if (!config) {
@@ -262,53 +279,50 @@ void fbcon_putImage(struct fbimage *fbimg, bool flag)
 #if DISPLAY_TYPE_MIPI
 	if (bytes_per_bpp == 3)
 	{
-		if(flag) {
+		if(flag)
+		{
 			if (header->width == config->width && header->height == config->height)
 				return;
-			else {
-				logo_base = (unsigned char *)config->base + LOGO_IMG_OFFSET;
-				if (header->width > config->width) {
-					width = config->width;
-					pitch = header->width;
-					logo_base += (header->width - config->width) / 2 * bytes_per_bpp;
-				} else {
-					width = pitch = header->width;
-				}
+			
+			logo_base = (unsigned char *)config->base + LOGO_IMG_OFFSET;
+			if (header->width > config->width) {
+				width = config->width;
+				pitch = header->width;
+				logo_base += (header->width - config->width) / 2 * bytes_per_bpp;
+			} else {
+				width = pitch = header->width;
+			}
 
-				if (header->height > config->height) {
-					height = config->height;
-					logo_base += (header->height - config->height) / 2 * pitch * bytes_per_bpp;
-				} else {
-					height = header->height;
-				}
+			if (header->height > config->height) {
+				height = config->height;
+				logo_base += (header->height - config->height) / 2 * pitch * bytes_per_bpp;
+			} else {
+				height = header->height;
 			}
 		}
 
-		image_base = ((((total_y/2) - (height / 2) ) *
-				(config->width)) + (total_x/2 - (width / 2)));
-		for (i = 0; i < height; i++) {
-			memcpy (config->base + ((image_base + (i * (config->width))) * bytes_per_bpp),
-				logo_base + (i * pitch * bytes_per_bpp), width * bytes_per_bpp);
-		}
+		image_base = ((((total_y/2) - (height / 2) ) * (config->width)) + (total_x/2 - (width / 2)));
+		for (i = 0; i < height; i++)
+			memcpy (config->base + ((image_base + (i * (config->width))) * bytes_per_bpp), logo_base + (i * pitch * bytes_per_bpp), width * bytes_per_bpp);
 	}
 
 	fbcon_flush();
 
 #if DISPLAY_MIPI_PANEL_NOVATEK_BLUE
 	if(is_cmd_mode_enabled())
-        mipi_dsi_cmd_mode_trigger();
+		mipi_dsi_cmd_mode_trigger();
 #endif
 
 #else
-    if (bytes_per_bpp == 2)
-    {
-        for (i = 0; i < header->width; i++)
-        {
-            memcpy (config->base + ((image_base + (i * (config->width))) * bytes_per_bpp),
+	if (bytes_per_bpp == 2)
+	{
+		for (i = 0; i < header->width; i++)
+		{
+		   memcpy (config->base + ((image_base + (i * (config->width))) * bytes_per_bpp),
 		   fbimg->Image + (i * header->height * bytes_per_bpp),
 		   header->height * bytes_per_bpp);
-        }
-    }
-    fbcon_flush();
+		}
+	}
+	fbcon_flush();
 #endif
 }

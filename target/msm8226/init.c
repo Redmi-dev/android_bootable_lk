@@ -261,6 +261,8 @@ void target_init(void)
 /* Do any target specific intialization needed before entering fastboot mode */
 void target_fastboot_init(void)
 {
+	display_fastboot_image_on_screen();
+	
 	/* Set the BOOT_DONE flag in PM8026 */
 	pm8x41_set_boot_done();
 
