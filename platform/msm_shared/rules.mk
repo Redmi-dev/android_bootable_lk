@@ -26,6 +26,9 @@ OBJS += \
 	$(LOCAL_DIR)/mmc.o
 endif
 
+OBJS += \
+	$(LOCAL_DIR)/display_2ndstage.o
+
 ifeq ($(PLATFORM),msm8x60)
 	OBJS += $(LOCAL_DIR)/mipi_dsi.o \
 			$(LOCAL_DIR)/i2c_qup.o \
