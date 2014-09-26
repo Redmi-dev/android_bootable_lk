@@ -372,13 +372,43 @@ void fastboot_okay(const char *info)
 static void cmd_getvar(const char *arg, void *data, unsigned sz)
 {
 	struct fastboot_var *var;
+	bool all = false;
+	char response[128];
+
+	all = !strcmp("all", arg);
 
 	for (var = varlist; var; var = var->next) {
-		if (!strcmp(var->name, arg)) {
+		if (all) {
+			snprintf(response, sizeof(response), "\t%s: [%s]", var->name, var->value);
+			fastboot_info(response);
+		}
+		else if (!strcmp(var->name, arg)) {
 			fastboot_okay(var->value);
 			return;
 		}
 	}
+	fastboot_okay("");
+}
+
+static void cmd_help(const char *arg, void *data, unsigned sz)
+{
+	struct fastboot_cmd *cmd;
+	char response[128];
+
+	// print commands
+	fastboot_info("commands:");
+	for (cmd = cmdlist; cmd; cmd = cmd->next) {
+		char buf[cmd->prefix_len+1];
+
+		if (!memcpy(buf, cmd->prefix, cmd->prefix_len))
+				continue;
+
+		buf[cmd->prefix_len] = '\0';
+
+		snprintf(response, sizeof(response), "\t%s", buf);
+		fastboot_info(response);
+	}
+
 	fastboot_okay("");
 }
 
@@ -445,7 +475,9 @@ again:
 			goto again;
 		}
 
-		fastboot_fail("unknown command");
+		fastboot_info("unknown command");
+		fastboot_info("See 'fastboot oem help'");
+		fastboot_fail("");
 
 	}
 	fastboot_state = STATE_OFFLINE;
@@ -512,7 +544,8 @@ int fastboot_init(void *base, unsigned size)
 
 	fastboot_register("getvar:", cmd_getvar);
 	fastboot_register("download:", cmd_download);
-	fastboot_publish("version", "0.5");
+	fastboot_register("oem help", cmd_help);
+	fastboot_publish("version", "DualLoader 0.1");
 
 	thr = thread_create("fastboot", fastboot_handler, 0, DEFAULT_PRIORITY, 4096);
 	if (!thr)

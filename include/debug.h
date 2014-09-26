@@ -62,6 +62,10 @@ int dgetc(char *c, bool wait);
 /* systemwide halts */
 void halt(void);
 
+/* lk_log */
+char* lk_log_getbuf(void);
+unsigned lk_log_getsize(void);
+
 void _panic(void *caller, const char *fmt, ...) __PRINTFLIKE(2, 3);
 #define panic(x...) _panic(__GET_CALLER(), x)
 
