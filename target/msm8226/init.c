@@ -158,6 +158,11 @@ uint32_t target_volume_down()
 	return pm8x41_resin_status();
 }
 
+int target_power_key(void)
+{
+	return pm8x41_get_pwrkey_is_pressed();
+}
+
 static void target_keystatus()
 {
 	keys_init();
