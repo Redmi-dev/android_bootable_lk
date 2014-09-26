@@ -93,6 +93,7 @@ void write_device_info_flash(device_info *dev);
 
 #define MAX_TAGS_SIZE   1024
 
+#define NORMAL_MODE     0x77665501
 #define RECOVERY_MODE   0x77665502
 #define FASTBOOT_MODE   0x77665500
 
@@ -529,6 +530,7 @@ void boot_linux(void *kernel, unsigned *tags,
 	generate_atags(tags, final_cmdline, ramdisk, ramdisk_size);
 #endif
 
+	free(final_cmdline);
 	/* Perform target specific cleanup */
 	target_uninit();
 
@@ -1775,6 +1777,7 @@ void cmd_flash_mmc_sparse_img(const char *arg, void *data, unsigned sz)
 			break;
 
 			default:
+			dprintf(CRITICAL, "Unkown chunk type: %x\n",chunk_header->chunk_type);
 			fastboot_fail("Unknown chunk type");
 			return;
 		}
@@ -1936,7 +1939,7 @@ void cmd_reboot(const char *arg, void *data, unsigned sz)
 {
 	dprintf(INFO, "rebooting the device\n");
 	fastboot_okay("");
-	reboot_device(0);
+	reboot_device(NORMAL_MODE);
 }
 
 void cmd_reboot_bootloader(const char *arg, void *data, unsigned sz)
