@@ -2267,9 +2267,6 @@ void aboot_init(const struct app_descriptor *app)
 
 	read_device_info(&device);
 
-	dprintf(INFO, "Original ATAGS: %p\n", original_atags);
-	board_parse_original_atags();
-	
 	target_serialno((unsigned char *) sn_buf);
 	dprintf(SPEW,"serial number: %s\n",sn_buf);
 
