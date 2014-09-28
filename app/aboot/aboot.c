@@ -58,8 +58,6 @@
 #include <dev_tree.h>
 #endif
 
-#include "2ndstage_tools.h"
-
 #include "image_verify.h"
 #include "recovery.h"
 #include "bootimg.h"
@@ -405,12 +403,6 @@ unsigned char *update_cmdline(const char * cmdline)
 
 
 	dprintf(INFO, "cmdline: %s\n", cmdline_final);
-	
-	char *extended_cmdline = sndstage_extend_cmdline((char*)cmdline_final);
-	free(cmdline_final);
-	cmdline_final = (unsigned char*)extended_cmdline;
-
-	dprintf(INFO, "cmdline_extended: %s\n", cmdline_final);
 	return cmdline_final;
 }
 
@@ -1215,7 +1207,7 @@ continue_boot:
 BUF_DMA_ALIGN(info_buf, 4096);
 void write_device_info_mmc(device_info *dev)
 {
-	/*struct device_info *info = (void*) info_buf;
+	struct device_info *info = (void*) info_buf;
 	unsigned long long ptn = 0;
 	unsigned long long size;
 	int index = INVALID_PTN;
@@ -1235,12 +1227,12 @@ void write_device_info_mmc(device_info *dev)
 	{
 		dprintf(CRITICAL, "ERROR: Cannot write device info\n");
 		return;
-	}*/
+	}
 }
 
 void read_device_info_mmc(device_info *dev)
 {
-	/*struct device_info *info = (void*) info_buf;
+	struct device_info *info = (void*) info_buf;
 	unsigned long long ptn = 0;
 	unsigned long long size;
 	int index = INVALID_PTN;
@@ -1269,17 +1261,12 @@ void read_device_info_mmc(device_info *dev)
 
 		write_device_info_mmc(info);
 	}
-	memcpy(dev, info, sizeof(device_info));*/
-	
-	memcpy(dev->magic, DEVICE_MAGIC, DEVICE_MAGIC_SIZE);
-	dev->is_tampered = 0;
-	dev->is_unlocked = 0;
-	dev->charger_screen_enabled = 1;
+	memcpy(dev, info, sizeof(device_info));
 }
 
 void write_device_info_flash(device_info *dev)
 {
-	/*struct device_info *info = (void *) info_buf;
+	struct device_info *info = (void *) info_buf;
 	struct ptentry *ptn;
 	struct ptable *ptable;
 
@@ -1303,12 +1290,12 @@ void write_device_info_flash(device_info *dev)
 	{
 		dprintf(CRITICAL, "ERROR: Cannot write device info\n");
 			return;
-	}*/
+	}
 }
 
 void read_device_info_flash(device_info *dev)
 {
-	/*struct device_info *info = (void*) info_buf;
+	struct device_info *info = (void*) info_buf;
 	struct ptentry *ptn;
 	struct ptable *ptable;
 
@@ -1339,12 +1326,7 @@ void read_device_info_flash(device_info *dev)
 		info->is_tampered = 0;
 		write_device_info_flash(info);
 	}
-	memcpy(dev, info, sizeof(device_info));*/
-	
-	memcpy(dev->magic, DEVICE_MAGIC, DEVICE_MAGIC_SIZE);
-	dev->is_tampered = 0;
-	dev->is_unlocked = 0;
-	dev->charger_screen_enabled = 1;
+	memcpy(dev, info, sizeof(device_info));
 }
 
 void write_device_info(device_info *dev)

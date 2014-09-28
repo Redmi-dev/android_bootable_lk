@@ -37,7 +37,6 @@ _start:
 	b	arm_fiq
 
 reset:
-	str	r2, original_atags
 
 #ifdef ENABLE_TRUSTZONE
 	/*Add reference to TZ symbol so linker includes it in final image */
@@ -113,9 +112,6 @@ reset:
 warm_boot_tag:
 	.word 0
 #endif
-.global original_atags
-original_atags:
-	.word 0
 
 .Lstack_setup:
 	/* set up the stack for irq, fiq, abort, undefined, system/user, and lastly supervisor mode */

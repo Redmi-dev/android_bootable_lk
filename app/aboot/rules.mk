@@ -7,6 +7,5 @@ DEFINES += ASSERT_ON_TAMPER=1
 OBJS += \
 	$(LOCAL_DIR)/aboot.o \
 	$(LOCAL_DIR)/fastboot.o \
-	$(LOCAL_DIR)/recovery.o \
-	$(LOCAL_DIR)/2ndstage_tools.o
+	$(LOCAL_DIR)/recovery.o
 

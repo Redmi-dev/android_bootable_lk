@@ -43,18 +43,6 @@
 
 #define DTB_PAD_SIZE            1024
 
-/*
- * For DTB V1: The DTB entries would be of the format
- * qcom,msm-id = <msm8974, CDP, rev_1>; (3 * sizeof(uint32_t))
- * For DTB V2: The DTB entries would be of the format
- * qcom,msm-id   = <msm8974, rev_1>;  (2 * sizeof(uint32_t))
- * qcom,board-id = <CDP, subtype_ID>; (2 * sizeof(uint32_t))
- * The macros below are defined based on these.
- */
-#define DT_ENTRY_V1_SIZE        0xC
-#define PLAT_ID_SIZE            0x8
-#define BOARD_ID_SIZE           0x8
-#define PMIC_ID_SIZE           0x8
 struct dt_entry
 {
 	uint32_t platform_id;
@@ -77,14 +65,6 @@ enum dt_err_codes
 	DT_OP_SUCCESS,
 	DT_OP_FAILURE = -1,
 };
-
-struct original_fdt_property {
-	const char *name;
-	void *data;
-	int len;
-};
-
-int parse_original_devtree(void *fdt);
 
 int dev_tree_validate(struct dt_table *table, unsigned int page_size, uint32_t *dt_hdr_size);
 int dev_tree_get_entry_info(struct dt_table *table, struct dt_entry *dt_entry_info);
